@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "gesp-439210",
+  "private_key_id": "ec65cc82e8a85855b1016f89a77b8f09577a2f44",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQChA3KqMMozOM70\nnYL5AbOffG5+lzTLiyVdY2e0sJVJayf47I56XaejrKkRTB7BI1ioDjfLFysk0TJi\nRS8nDRW25GsYRejTN3d3WYHWa8NesTNuX8SYRmFMdtnl+41HYE5H+7uLGbmfrc9p\nIc3DcHkjDtt7sIlh3dEtqmA57fUqOQQFYMOZLMzjBf0GF+/zBwi8Y9T1teP4fbOa\nE1R9OPZOOhRPjKB1FR8ezr5ttKqf1/3Ds4+wYr8uK5HUyT13J2K52Vm3KHH1nJS4\nSzvXqkfbQv67Zjp0VNXGzVJyrxYKMePF0T2NYkum1u8LvcI3ZAuh0Y8gZHUPbk1C\n5lboABeZAgMBAAECggEAQwrEe8jE6H8G7SOInVXwDMAq4drjyLyvWitByyKbhm5v\nvl4BFUJZwvTpkKI5TAIDsDX7VTzYYgQZDoHwGDqCiByj2v+A6jF2NOO4BCfquUrf\nN1345c6oRMZYBEKxmL6o2aAfftO/TpV4fzXsDyyNw+Mz0FS5X16U8oa2emhyZJmf\nEQEKwXOGKUOEGUWtxGR3Ow14kcY560k2AUlxcRo2cCkSaEbVEHEV6kdjRpmGeDIE\nifsC55081i54KvzWeBCSVd3oRYjKcgyqm9wxHdM4CCXxa9UximGo6jIE8NV1AnDE\n2Xp3BRiH9RY4YpkXVc6ruuhzLkAvfMuwJ/XilIXTYQKBgQDfeVFAQbzcDMLYJ6Zt\nIM2AXl4IxsGR/yZn2w70K2VoODo3BsV0Xu/fBVeC2AekN/MVy7lmSJ3ihdu3kAsY\nhOspcGeLZ/QqQreTu2u2S0japvqbrMTnQBnegCM4C7kHAjcs10/uVEx7TZztqRUT\nxZkD0fbDZHZ3kErd8LIyD45cswKBgQC4ctejvYXvN0myvvrwYG0PFsE95Ko1vZIf\nvh8k2uksknBq0YKGdICabf+y72RnIX3Q9yflrzdsbHcLfQ8vofB5eGylEu2U+Zno\nqo2YES5C/mo4aU4eJZC3+LvSxsd42r6HtAvsr0uUB5Z+CbWSdfCKr8S/qbxT1X4g\nG5Wv0WK4gwKBgQDEDhMSZJnkE+385QxFQToJHMEyweygwVBYXP7JiCj3Ph0UmYQx\ni/i1mGImEJDjqZJB1PFaouqhCP6yFFUntbT6LfspepHjYZTcrtjYnUPVUBkc6n30\nw2/unExJpz80vuTZGiyt0pcmtfivKF+tcPXFPDdZRJIKYzTLcZdkA/HJsQKBgFsH\nkpUk++zLhHvK9V2cuTYxLL23FKnhHTS9R/GQeHOe8gxFyf1BkhalIwTUUOD1DnsK\n/43Do77G6RmqZsxDR8MrQ7NUXByh8ut5ANiD4ij+Fr4wenU2ZO3mvAuSPu/ORSoE\nGb595Pbxp7wcXpghzM0lYhyVUHSvcMe31XAoDmixAoGAJC2wb5UsdmFODcIT8/OC\n+wO2DHPDb1jkmKQVy+aLv4tkXDQo7gcY2/OUoewoNkeAIBu3JsFM0lD1uwp6HJHu\nYNgzjvsjhaA+tYGC6WKgL91JA9yF5TMZTc649sGrzU/tXlcH12sm9auOWPyvnepB\n89glwDB218LzMKKgSyUKgrg=\n-----END PRIVATE KEY-----\n",
+  "client_email": "calendar-app-gespyme@gesp-439210.iam.gserviceaccount.com",
+  "client_id": "106375212341142060006",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/calendar-app-gespyme%40gesp-439210.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
