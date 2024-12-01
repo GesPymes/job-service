@@ -12,13 +12,15 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "APPOINTMENT")
 public class AppointmentEntity {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private String appointmentId;
+  @Id private String appointmentId;
 
   @Column(name = "job_id")
   private String jobId;
+
+  @Column(name = "calendar_id")
+  private String calendarId;
 
   @Column(name = "status")
   private String status;

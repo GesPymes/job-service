@@ -2,12 +2,12 @@ package com.gespyme.infrastructure.adapters.calendar.input.customer;
 
 import com.gespyme.application.appointment.port.output.facade.CustomerFacade;
 import com.gespyme.commons.model.customer.CustomerModelApi;
-import com.gespyme.rest.OperationType;
+import com.gespyme.rest.RestCallService;
 import com.gespyme.rest.RestRequest;
-import com.gespyme.rest.SimpleRestCallService;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
@@ -15,11 +15,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CustomerApiRestCallService implements CustomerFacade {
 
-  // TODO
-  // @Value("${customer.endpoint}")
-  private String customerEndpoint = "http://localhost:8081";
+  private final RestCallService<CustomerModelApi, CustomerModelApi> restService;
 
-  private final SimpleRestCallService<CustomerModelApi> restService;
+  @Value("${customer.endpoint}")
+  private String customerEndpoint;
+
   ParameterizedTypeReference<List<CustomerModelApi>> typeReference =
       new ParameterizedTypeReference<List<CustomerModelApi>>() {};
 
@@ -28,7 +28,6 @@ public class CustomerApiRestCallService implements CustomerFacade {
         RestRequest.builder()
             .server(customerEndpoint)
             .path("/customer")
-            .operationType(OperationType.GET)
             .headers(Map.of("Content-Type", "application/json"))
             .queryParams(Map.of("name", customerName))
             .build(),

@@ -1,6 +1,6 @@
 package com.gespyme.infrastructure.adapters.calendar.input;
 
-import com.gespyme.application.calendar.port.input.ModifyCalendarUseCase;
+import com.gespyme.application.calendar.port.input.ModifyCalendarPort;
 import com.gespyme.application.calendar.usecase.CreateCalendarUseCase;
 import com.gespyme.application.calendar.usecase.DeleteCalendarUseCase;
 import com.gespyme.application.calendar.usecase.FindCalendarByIdUseCase;
@@ -10,12 +10,13 @@ import com.gespyme.commons.model.job.CalendarFilterModelApi;
 import com.gespyme.commons.model.job.CalendarModelApi;
 import com.gespyme.commons.validator.Validator;
 import com.gespyme.commons.validator.ValidatorService;
+import com.gespyme.domain.calendar.filter.CalendarFilter;
 import com.gespyme.domain.calendar.model.Calendar;
-import com.gespyme.domain.filter.CalendarFilter;
 import com.gespyme.infrastructure.mapper.CalendarMapper;
-import jakarta.websocket.server.PathParam;
+import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,41 +28,47 @@ public class CalendarController {
   private final FindCalendarByIdUseCase findCalendarByIdUseCase;
   private final DeleteCalendarUseCase deleteCalendarUseCase;
   private final CreateCalendarUseCase createCalendarUseCase;
-  private final ModifyCalendarUseCase modifyCalendarUseCase;
+  private final ModifyCalendarPort modifyCalendarUseCase;
   private final ValidatorService<CalendarBaseModelApi> validatorService;
 
   @GetMapping("/{calendarId}")
-  public CalendarModelApi getCalendarById(@PathParam("calendarId") String calendarId) {
+  public ResponseEntity<CalendarModelApi> getCalendarById(
+      @PathVariable("calendarId") String calendarId) {
     validatorService.validateId(calendarId);
     Calendar calendar = findCalendarByIdUseCase.getCalendarById(calendarId);
-    return calendarMapper.map(calendar);
+    return ResponseEntity.ok(calendarMapper.map(calendar));
   }
 
   @GetMapping("/")
-  public List<CalendarModelApi> findCalendars(CalendarFilterModelApi calendarFilterModelApi) {
+  public ResponseEntity<List<CalendarModelApi>> findCalendars(
+      CalendarFilterModelApi calendarFilterModelApi) {
     validatorService.validate(calendarFilterModelApi, List.of(Validator.ONE_PARAM_NOT_NULL));
     CalendarFilter calendarFilter = calendarMapper.map(calendarFilterModelApi);
     List<Calendar> calendars = findCalendarsUseCase.findCalendars(calendarFilter);
-    return calendarMapper.map(calendars);
+    return ResponseEntity.ok(calendarMapper.map(calendars));
   }
 
-  @DeleteMapping("/{calendarId}")
-  public void deleteCalendar(@PathParam("calendarId") String calendarId) {
-    validatorService.validateId(calendarId);
-    deleteCalendarUseCase.deleteCalendar(calendarId);
+  @DeleteMapping("/{calendarName}")
+  public ResponseEntity<Void> deleteCalendar(@PathVariable("calendarName") String calendarName) {
+    deleteCalendarUseCase.deleteCalendar(calendarName);
+    return ResponseEntity.noContent().build();
   }
 
   @PostMapping("/")
-  public CalendarModelApi createCalendar(CalendarModelApi calendarApiModel) {
+  public ResponseEntity<CalendarModelApi> createCalendar(
+      @RequestBody CalendarModelApi calendarApiModel) {
     validatorService.validate(calendarApiModel, List.of(Validator.ALL_PARAMS_NOT_NULL));
     Calendar calendar = createCalendarUseCase.createCalendar(calendarMapper.map(calendarApiModel));
-    return calendarMapper.map(calendar);
+    URI location = URI.create("/calendar/" + calendar.getCalendarId());
+    return ResponseEntity.created(location).body(calendarMapper.map(calendar));
   }
 
-  @PatchMapping("/")
-  public CalendarModelApi modifyCalendar(CalendarModelApi calendarApiModel) {
+  @PatchMapping("/{calendarName}")
+  public ResponseEntity<CalendarModelApi> modifyCalendar(
+      @PathVariable String calendarName, @RequestBody CalendarModelApi calendarApiModel) {
     validatorService.validate(calendarApiModel, List.of(Validator.ONE_PARAM_NOT_NULL));
-    Calendar calendar = modifyCalendarUseCase.modifyCalendar(calendarMapper.map(calendarApiModel));
-    return calendarMapper.map(calendar);
+    Calendar calendar =
+        modifyCalendarUseCase.modifyCalendar(calendarName, calendarMapper.map(calendarApiModel));
+    return ResponseEntity.ok(calendarMapper.map(calendar));
   }
 }

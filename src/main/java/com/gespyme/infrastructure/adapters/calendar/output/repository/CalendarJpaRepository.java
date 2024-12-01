@@ -91,7 +91,8 @@ public class CalendarJpaRepository implements CalendarRepository {
 
   @Override
   public Calendar save(Calendar calendar) {
-    CalendarEntity calendarEntity = calendarRepositoryJpa.save(mapper.mapToEntity(calendar));
+    CalendarEntity calendarEntity = mapper.mapToEntity(calendar);
+    calendarRepositoryJpa.save(calendarEntity);
     return mapper.map(calendarEntity);
   }
 

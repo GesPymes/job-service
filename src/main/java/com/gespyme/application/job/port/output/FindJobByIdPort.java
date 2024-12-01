@@ -2,15 +2,15 @@ package com.gespyme.application.job.port.output;
 
 import com.gespyme.application.job.usecase.FindJobByIdUseCase;
 import com.gespyme.commons.exeptions.NotFoundException;
-import com.gespyme.commons.repository.GenericRepository;
 import com.gespyme.domain.job.model.Job;
+import com.gespyme.domain.job.repository.JobRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class FindJobByIdPort implements FindJobByIdUseCase {
-  private final GenericRepository<Job> repository;
+  private final JobRepository repository;
 
   @Override
   public Job getJobById(String jobId) {

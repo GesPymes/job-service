@@ -2,8 +2,8 @@ package com.gespyme.application.appointment.port.output;
 
 import com.gespyme.application.appointment.usecase.FindAppointmentsByIdUseCase;
 import com.gespyme.commons.exeptions.NotFoundException;
-import com.gespyme.commons.repository.GenericRepository;
 import com.gespyme.domain.appointment.model.Appointment;
+import com.gespyme.domain.appointment.repository.AppointmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FindAppointmentsByIdPort implements FindAppointmentsByIdUseCase {
 
-  private final GenericRepository<Appointment> repository;
+  private final AppointmentRepository repository;
 
   @Override
   public Appointment getAppointmentById(String appointmentId) {

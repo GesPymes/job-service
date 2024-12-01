@@ -1,11 +1,11 @@
 package com.gespyme.application.calendar.port.output;
 
 import com.gespyme.application.calendar.usecase.FindCalendarsUseCase;
+import com.gespyme.commons.model.filter.FieldFilter;
 import com.gespyme.commons.repository.criteria.SearchCriteria;
+import com.gespyme.domain.calendar.filter.CalendarFilter;
 import com.gespyme.domain.calendar.model.Calendar;
 import com.gespyme.domain.calendar.repository.CalendarRepository;
-import com.gespyme.domain.filter.CalendarFilter;
-import com.gespyme.domain.filter.FieldFilter;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
