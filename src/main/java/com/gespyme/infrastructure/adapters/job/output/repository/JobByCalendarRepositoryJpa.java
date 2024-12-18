@@ -27,7 +27,6 @@ public class JobByCalendarRepositoryJpa implements JobByCalendarRepository {
 
   @Override
   public void save(JobByCalendar jobByCalendar) {
-      jobsByCalendarRepositorySpringJpa.save(mapper.map(jobByCalendar));
+    jobsByCalendarRepositorySpringJpa.save(mapper.map(jobByCalendar));
   }
-
 }

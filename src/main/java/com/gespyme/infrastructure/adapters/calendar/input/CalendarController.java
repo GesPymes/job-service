@@ -39,7 +39,7 @@ public class CalendarController {
     return ResponseEntity.ok(calendarMapper.map(calendar));
   }
 
-  @GetMapping("/")
+  @GetMapping
   public ResponseEntity<List<CalendarModelApi>> findCalendars(
       CalendarFilterModelApi calendarFilterModelApi) {
     validatorService.validate(calendarFilterModelApi, List.of(Validator.ONE_PARAM_NOT_NULL));
@@ -48,13 +48,19 @@ public class CalendarController {
     return ResponseEntity.ok(calendarMapper.map(calendars));
   }
 
-  @DeleteMapping("/{calendarName}")
+  @DeleteMapping("/name/{calendarName}")
   public ResponseEntity<Void> deleteCalendar(@PathVariable("calendarName") String calendarName) {
     deleteCalendarUseCase.deleteCalendar(calendarName);
     return ResponseEntity.noContent().build();
   }
 
-  @PostMapping("/")
+  @DeleteMapping("/{calendarId}")
+  public ResponseEntity<Void> deleteCalendarById(@PathVariable("calendarId") String calendarId) {
+    deleteCalendarUseCase.deleteCalendarById(calendarId);
+    return ResponseEntity.noContent().build();
+  }
+
+  @PostMapping
   public ResponseEntity<CalendarModelApi> createCalendar(
       @RequestBody CalendarModelApi calendarApiModel) {
     validatorService.validate(calendarApiModel, List.of(Validator.ALL_PARAMS_NOT_NULL));
@@ -63,12 +69,12 @@ public class CalendarController {
     return ResponseEntity.created(location).body(calendarMapper.map(calendar));
   }
 
-  @PatchMapping("/{calendarName}")
+  @PatchMapping("/{calendarId}")
   public ResponseEntity<CalendarModelApi> modifyCalendar(
-      @PathVariable String calendarName, @RequestBody CalendarModelApi calendarApiModel) {
+      @PathVariable String calendarId, @RequestBody CalendarModelApi calendarApiModel) {
     validatorService.validate(calendarApiModel, List.of(Validator.ONE_PARAM_NOT_NULL));
     Calendar calendar =
-        modifyCalendarUseCase.modifyCalendar(calendarName, calendarMapper.map(calendarApiModel));
+        modifyCalendarUseCase.modifyCalendar(calendarId, calendarMapper.map(calendarApiModel));
     return ResponseEntity.ok(calendarMapper.map(calendar));
   }
 }

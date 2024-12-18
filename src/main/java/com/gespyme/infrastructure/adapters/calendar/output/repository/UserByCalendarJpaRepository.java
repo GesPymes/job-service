@@ -12,18 +12,20 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserByCalendarJpaRepository implements UserByCalendarRepository {
 
-    private final UsersByCalendarRepositorySpringJpa usersByCalendarRepositorySpringJpa;
-    private final UserByCalendarMapper mapper;
+  private final UsersByCalendarRepositorySpringJpa usersByCalendarRepositorySpringJpa;
+  private final UserByCalendarMapper mapper;
 
-    @Override
-    public List<UserByCalendar> getUserByCalendarByUserEmail(String userId) {
-    return mapper.map(
-        usersByCalendarRepositorySpringJpa
-            .findByUserEmail(userId));
-    }
+  @Override
+  public List<UserByCalendar> getUserByCalendarByUserEmail(String userId) {
+    return mapper.map(usersByCalendarRepositorySpringJpa.findByUserEmail(userId));
+  }
 
-    @Override
-    public void save(UserByCalendar userByCalendar) {
-        usersByCalendarRepositorySpringJpa.save(mapper.map(userByCalendar));
-    }
+  @Override
+  public UserByCalendar save(UserByCalendar userByCalendar) {
+    return mapper.map(usersByCalendarRepositorySpringJpa.save(mapper.map(userByCalendar)));
+  }
+
+  public void deleteById(String id) {
+    usersByCalendarRepositorySpringJpa.deleteById(id);
+  }
 }

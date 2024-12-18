@@ -1,6 +1,5 @@
 package com.gespyme.domain.job.model;
 
-import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 import lombok.With;
@@ -9,8 +8,11 @@ import lombok.With;
 @Builder(toBuilder = true)
 public class Job {
   private String jobId;
-  private String customerId;
-  private String employeeId;
+  @With private String customerId;
+  @With private String employeeId;
+  private String customerName;
+  private String customerLastName;
+  private String employeeName;
   @With private Integer periodicity;
   @With private Boolean isPeriodic;
   private String description;

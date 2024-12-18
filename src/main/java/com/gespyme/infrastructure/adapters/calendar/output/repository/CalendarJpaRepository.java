@@ -3,19 +3,18 @@ package com.gespyme.infrastructure.adapters.calendar.output.repository;
 import com.gespyme.commons.repository.QueryField;
 import com.gespyme.commons.repository.criteria.SearchCriteria;
 import com.gespyme.domain.calendar.model.Calendar;
+import com.gespyme.domain.calendar.model.UserByCalendar;
 import com.gespyme.domain.calendar.repository.CalendarRepository;
 import com.gespyme.infrastructure.adapters.calendar.output.model.entity.CalendarEntity;
 import com.gespyme.infrastructure.adapters.calendar.output.model.entity.QCalendarEntity;
+import com.gespyme.infrastructure.adapters.calendar.output.model.entity.QUserByCalendarEntity;
 import com.gespyme.infrastructure.adapters.calendar.output.repository.jpa.CalendarRepositorySpringJpa;
 import com.gespyme.infrastructure.mapper.CalendarMapper;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Repository;
 
@@ -25,29 +24,36 @@ public class CalendarJpaRepository implements CalendarRepository {
   private final JPAQueryFactory queryFactory;
   private final CalendarMapper mapper;
   private final CalendarRepositorySpringJpa calendarRepositoryJpa;
+  private final UserByCalendarJpaRepository userByCalendarJpaRepository;
 
   public CalendarJpaRepository(
       List<QueryField> queryFields,
       CalendarRepositorySpringJpa calendarRepositoryJpa,
       JPAQueryFactory queryFactory,
-      CalendarMapper mapper) {
+      CalendarMapper mapper,
+      UserByCalendarJpaRepository userByCalendarJpaRepository) {
     this.calendarRepositoryJpa = calendarRepositoryJpa;
     this.queryFactory = queryFactory;
     this.mapper = mapper;
     queryFieldMap =
         queryFields.stream()
             .collect(Collectors.toMap(QueryField::getFieldName, queryField -> queryField));
+    this.userByCalendarJpaRepository = userByCalendarJpaRepository;
   }
 
   public List<Calendar> findByCriteria(List<SearchCriteria> searchCriteria) {
-    QCalendarEntity calendar = QCalendarEntity.calendarEntity;
-    JPAQuery<CalendarEntity> query = queryFactory.select(calendar).from(calendar);
+    QCalendarEntity calendarEntity = QCalendarEntity.calendarEntity;
+    QUserByCalendarEntity userByCalendar = QUserByCalendarEntity.userByCalendarEntity;
+    JPAQuery<CalendarEntity> query =
+        queryFactory
+            .select(calendarEntity)
+            .from(calendarEntity)
+            .innerJoin(calendarEntity.users, userByCalendar);
     BooleanBuilder booleanBuilder = getPredicates(searchCriteria);
-    List<Tuple> result =
-        Objects.nonNull(booleanBuilder.getValue())
-            ? executeQueryWithPredicate(calendar, booleanBuilder, query)
-            : executeQueryWithoutPredicate(calendar, query);
-    return result.stream().map(tuple -> mapTuple(tuple, calendar)).collect(Collectors.toList());
+
+    return Objects.nonNull(booleanBuilder.getValue())
+        ? executeQueryWithPredicate(calendarEntity, userByCalendar, booleanBuilder, query)
+        : executeQueryWithoutPredicate(calendarEntity, userByCalendar, query);
   }
 
   private BooleanBuilder getPredicates(List<SearchCriteria> searchCriteria) {
@@ -57,26 +63,57 @@ public class CalendarJpaRepository implements CalendarRepository {
     return booleanBuilder;
   }
 
-  private List<Tuple> executeQueryWithPredicate(
+  private List<Calendar> executeQueryWithPredicate(
       QCalendarEntity calendarEntity,
+      QUserByCalendarEntity userByCalendar,
       BooleanBuilder booleanBuilder,
       JPAQuery<CalendarEntity> query) {
-    return query
-        .select(calendarEntity.calendarId, calendarEntity.calendarName)
-        .where(booleanBuilder)
-        .fetch();
+    List<Tuple> results =
+        query.select(calendarEntity, userByCalendar).where(booleanBuilder).fetch();
+    return getCalendars(calendarEntity, userByCalendar, results);
   }
 
-  private List<Tuple> executeQueryWithoutPredicate(
-      QCalendarEntity calendarEntity, JPAQuery<CalendarEntity> query) {
-    return query.select(calendarEntity.calendarId, calendarEntity.calendarName).fetch();
+  private List<Calendar> executeQueryWithoutPredicate(
+      QCalendarEntity calendarEntity,
+      QUserByCalendarEntity userByCalendar,
+      JPAQuery<CalendarEntity> query) {
+    List<Tuple> results =
+        query
+            .select(
+                calendarEntity.calendarId,
+                calendarEntity.calendarName,
+                userByCalendar.userEmail,
+                userByCalendar.userByCalendarId)
+            .fetch();
+    return getCalendars(calendarEntity, userByCalendar, results);
   }
 
-  private Calendar mapTuple(Tuple tuple, QCalendarEntity calendarEntity) {
-    return Calendar.builder()
-        .calendarId(tuple.get(calendarEntity.calendarId))
-        .calendarName(tuple.get(calendarEntity.calendarName))
-        .build();
+  private ArrayList<Calendar> getCalendars(
+      QCalendarEntity calendarEntity, QUserByCalendarEntity userByCalendar, List<Tuple> results) {
+    Map<String, Calendar> calendarMap = new HashMap<>();
+
+    for (Tuple tuple : results) {
+      String calendarId = tuple.get(calendarEntity.calendarId);
+      String calendarName = tuple.get(calendarEntity.calendarName);
+      String userByCalendarId = tuple.get(userByCalendar.userByCalendarId);
+      String userEmail = tuple.get(userByCalendar.userEmail);
+
+      Calendar calendar = calendarMap.get(calendarId);
+      if (calendar == null) {
+        calendar = Calendar.builder().calendarId(calendarId).calendarName(calendarName).build();
+        calendarMap.put(calendarId, calendar);
+      }
+      UserByCalendar userDTO =
+          UserByCalendar.builder()
+              .userByCalendarId(userByCalendarId)
+              .calendarId(calendarId)
+              .userEmail(userEmail)
+              .build();
+
+      calendar.addUser(userDTO);
+    }
+
+    return new ArrayList<>(calendarMap.values());
   }
 
   @Override
@@ -99,7 +136,56 @@ public class CalendarJpaRepository implements CalendarRepository {
   @Override
   public Calendar merge(Calendar newCalendarData, Calendar calendar) {
     Calendar merged = mapper.merge(newCalendarData, calendar);
-    CalendarEntity savedEntity = calendarRepositoryJpa.save(mapper.mapToEntity(merged));
+    if(shouldChangeUsers(newCalendarData)) {
+      List<UserByCalendar> users = getChangedUsers(newCalendarData, calendar);
+      merged = mapper.merge(newCalendarData.toBuilder().users(users).build(), calendar);
+    }
+    CalendarEntity savedEntity =
+        calendarRepositoryJpa.save(mapper.mapToEntity(merged));
     return mapper.map(savedEntity);
+  }
+
+  private List<UserByCalendar> getChangedUsers(
+          Calendar newCalendarData, Calendar calendar) {
+    List<UserByCalendar> newUsers =
+            completeUsers(newCalendarData.getUsers(), calendar.getCalendarId());
+    deleteChangedUsers(newUsers, calendar);
+    return addCalendarUsers(newUsers);
+  }
+
+  private List<UserByCalendar> completeUsers(List<UserByCalendar> newUsers, String calendarId) {
+    return newUsers.stream()
+            .map(user -> user.toBuilder().calendarId(calendarId).build())
+            .collect(Collectors.toList());
+  }
+
+  private List<UserByCalendar> addCalendarUsers(
+      List<UserByCalendar> newUsers) {
+    return newUsers.stream()
+        .map(userByCalendarJpaRepository::save)
+        .collect(Collectors.toList());
+  }
+
+  private void deleteChangedUsers(List<UserByCalendar> newUsers, Calendar calendar) {
+    List<UserByCalendar> oldUsers = calendar.getUsers();
+    List<String> toRemove = findDifference(oldUsers, newUsers);
+    toRemove.forEach(userByCalendarJpaRepository::deleteById);
+  }
+  public List<String> findDifference(List<UserByCalendar> oldUsers, List<UserByCalendar> newUsers) {
+    List<UserByCalendar> difference = new ArrayList<>(oldUsers);
+    difference.removeAll(newUsers);
+    return difference.stream()
+        .map(UserByCalendar::getUserByCalendarId)
+        .collect(Collectors.toList());
+  }
+
+
+
+  private boolean shouldChangeUsers(Calendar newCalendarData) {
+    return Objects.nonNull(newCalendarData.getUsers());
+  }
+
+  private void manageUsers(Calendar newCalendarData) {
+
   }
 }

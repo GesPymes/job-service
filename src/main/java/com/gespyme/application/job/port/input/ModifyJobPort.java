@@ -27,22 +27,32 @@ public class ModifyJobPort implements ModifyJobUseCase {
   @Override
   public Job modifyJob(String jobId, Job newJob) {
     Job job = repository.findById(jobId).orElseThrow(() -> new NotFoundException("Job not found"));
-    if (!Objects.equals(newJob.getEmployeeId(), job.getEmployeeId())) {
-      EmployeeModelApi employeeModelApi = employeeFacade.getEmployeeById(job.getEmployeeId());
-      List<String> userCalendars =
-          userByCalendarRepository
-              .getUserByCalendarByUserEmail(employeeModelApi.getEmail())
-              .stream()
-              .map(UserByCalendar::getCalendarId)
-              .toList();
-      deleteJobsByCalendar(jobId);
-      userCalendars.stream()
-          .map(
-              userCalendar -> JobByCalendar.builder().jobId(jobId).calendarId(userCalendar).build())
-          .forEach(jobByCalendarRepository::save);
+    if (Objects.nonNull(newJob.getEmployeeId())
+        && !Objects.equals(newJob.getEmployeeId(), job.getEmployeeId())) {
+      updateEmployeeCalendar(jobId, job);
     }
+    performPeriodicTableChange(job, newJob);
+    Job merged = repository.merge(newJob, job);
 
-    return repository.merge(newJob, job);
+    return merged;
+  }
+
+  private void performPeriodicTableChange(Job job, Job newJob) {
+    if (Objects.nonNull(newJob.getIsPeriodic()) && newJob.getIsPeriodic() != job.getIsPeriodic()) {
+      repository.deleteById(job.getJobId());
+    }
+  }
+
+  private void updateEmployeeCalendar(String jobId, Job job) {
+    EmployeeModelApi employeeModelApi = employeeFacade.getEmployeeById(job.getEmployeeId());
+    List<String> userCalendars =
+        userByCalendarRepository.getUserByCalendarByUserEmail(employeeModelApi.getEmail()).stream()
+            .map(UserByCalendar::getCalendarId)
+            .toList();
+    deleteJobsByCalendar(jobId);
+    userCalendars.stream()
+        .map(userCalendar -> JobByCalendar.builder().jobId(jobId).calendarId(userCalendar).build())
+        .forEach(jobByCalendarRepository::save);
   }
 
   private void deleteJobsByCalendar(String jobId) {

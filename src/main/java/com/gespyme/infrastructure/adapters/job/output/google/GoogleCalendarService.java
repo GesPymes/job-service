@@ -1,14 +1,13 @@
 package com.gespyme.infrastructure.adapters.job.output.google;
 
 import com.gespyme.commons.exeptions.InternalServerError;
+import com.gespyme.commons.exeptions.NotFoundException;
 import com.gespyme.domain.calendar.repository.CalendarService;
-import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.*;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -74,7 +73,13 @@ public class GoogleCalendarService implements CalendarService {
   @Override
   public void deleteCalendarEvent(String calendarId, String eventId) {
     try {
-      calendarService.events().delete(calendarId, eventId).execute();
+      com.google.api.services.calendar.Calendar.Events events = calendarService.events();
+      com.google.api.services.calendar.Calendar.Events.Get get = events.get(calendarId, eventId);
+      if(!get.isEmpty()) {
+        calendarService.events().delete(calendarId, eventId).execute();
+        return;
+      }
+      throw new NotFoundException("Event cannot be found");
     } catch (IOException e) {
       throw new InternalServerError("Event cannot be deleted from calendar", e);
     }

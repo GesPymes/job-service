@@ -121,7 +121,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\r\n  \"calendarName\": \"employee-calendar\",\r\n  \"users\": [\"gespyme.employee@gmail.com\"]\r\n}\r\n",
+													"raw": "{\r\n  \"calendarName\": \"employee-calendar\",\r\n  \"users\": [{\r\n      \"userEmail\": \"gespyme.employee@gmail.com\"\r\n  }]\r\n}\r\n",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -129,15 +129,14 @@
 													}
 												},
 												"url": {
-													"raw": "http://localhost:8084/calendar/",
+													"raw": "http://localhost:8084/calendar",
 													"protocol": "http",
 													"host": [
 														"localhost"
 													],
 													"port": "8084",
 													"path": [
-														"calendar",
-														""
+														"calendar"
 													]
 												}
 											},
@@ -149,14 +148,14 @@
 									"name": "KO- Create calendar - KO User",
 									"item": [
 										{
-											"name": "GetToken Admin",
+											"name": "GetToken User",
 											"event": [
 												{
 													"listen": "test",
 													"script": {
 														"exec": [
 															"var jsonData = JSON.parse(responseBody);\r",
-															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
+															"pm.globals.set(\"user_token\", \"Bearer \" + jsonData.token);\r",
 															"\r",
 															"pm.test(\"Token not null\", function () {\r",
 															"    const jsonData = pm.response.json(); \r",
@@ -176,7 +175,7 @@
 												"header": [],
 												"body": {
 													"mode": "raw",
-													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"raw": "{\r\n    \"email\" : \"gespyme.employee@gmail.com\",\r\n    \"password\" : \"employee-gespyme-2024-99Qabcde\"\r\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -235,7 +234,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\r\n  \"calendarName\": \"admin-calendar\"\r\n}\r\n",
+													"raw": "{\r\n  \"calendarName\": \"employee-calendar\",\r\n  \"users\": [{\r\n      \"userEmail\": \"gespyme.employee@gmail.com\"\r\n  }]\r\n}\r\n",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -243,15 +242,14 @@
 													}
 												},
 												"url": {
-													"raw": "http://localhost:8084/calendar/",
+													"raw": "http://localhost:8084/calendar",
 													"protocol": "http",
 													"host": [
 														"localhost"
 													],
 													"port": "8084",
 													"path": [
-														"calendar",
-														""
+														"calendar"
 													]
 												}
 											},
@@ -262,10 +260,10 @@
 							]
 						},
 						{
-							"name": "delete",
+							"name": "modify",
 							"item": [
 								{
-									"name": "KO- Create calendar - KO User",
+									"name": "OK- Modify calendar - KO Admin Copy",
 									"item": [
 										{
 											"name": "GetToken Admin",
@@ -316,6 +314,64 @@
 											},
 											"response": []
 										},
+										{
+											"name": "ModifyCalendar",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "PATCH",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"calendarName\": \"employee-calendar2\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8084/calendar/{{calendar_id}}",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8084",
+													"path": [
+														"calendar",
+														"{{calendar_id}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "delete",
+							"item": [
+								{
+									"name": "KO- Detele calendar - KO User",
+									"item": [
 										{
 											"name": "DeleteCalendar",
 											"event": [
@@ -380,7 +436,7 @@
 									]
 								},
 								{
-									"name": "OK- Create calendar - KO Admin",
+									"name": "OK- Delete calendar - KO Admin",
 									"item": [
 										{
 											"name": "GetToken Admin",
@@ -454,11 +510,9 @@
 															"    pm.response.to.have.status(201); \r",
 															"});\r",
 															"\r",
-															"var jsonData = JSON.parse(responseBody);\r",
-															"pm.globals.set(\"calendar_name\", jsonData.calendarName);\r",
 															"\r",
 															"var jsonData = JSON.parse(responseBody);\r",
-															"pm.globals.set(\"calendar_to_delete_name\", jsonData.calendarName);"
+															"pm.globals.set(\"calendar_to_delete_id\", jsonData.calendarId);"
 														],
 														"type": "text/javascript"
 													}
@@ -475,7 +529,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\r\n  \"calendarName\": \"admin-calendar\"\r\n}\r\n",
+													"raw": "{\r\n  \"calendarName\": \"employee-calendar\",\r\n  \"users\": [{\r\n      \"userEmail\": \"gespyme.employee@gmail.com\"\r\n  }]\r\n}\r\n",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -483,81 +537,14 @@
 													}
 												},
 												"url": {
-													"raw": "http://localhost:8084/calendar/",
+													"raw": "http://localhost:8084/calendar",
 													"protocol": "http",
 													"host": [
 														"localhost"
 													],
 													"port": "8084",
 													"path": [
-														"calendar",
-														""
-													]
-												}
-											},
-											"response": []
-										},
-										{
-											"name": "CreateCalendar user calendar Copy",
-											"event": [
-												{
-													"listen": "prerequest",
-													"script": {
-														"exec": [
-															"pm.request.headers.add({\r",
-															"    key: 'Authorization',\r",
-															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
-															"});"
-														],
-														"type": "text/javascript"
-													}
-												},
-												{
-													"listen": "test",
-													"script": {
-														"exec": [
-															"pm.test(\"Status code is 201\", function () {\r",
-															"    pm.response.to.have.status(201); \r",
-															"});\r",
-															"\r",
-															"var jsonData = JSON.parse(responseBody);\r",
-															"pm.globals.set(\"calendar_name\", jsonData.calendarName);\r",
-															"\r",
-															"var jsonData = JSON.parse(responseBody);\r",
-															"pm.globals.set(\"calendar_id\", jsonData.calendarId);"
-														],
-														"type": "text/javascript"
-													}
-												}
-											],
-											"request": {
-												"method": "POST",
-												"header": [
-													{
-														"key": "Authorization",
-														"value": "{{admin_token}}",
-														"type": "default"
-													}
-												],
-												"body": {
-													"mode": "raw",
-													"raw": "{\r\n  \"calendarName\": \"employee1-calendar\",\r\n  \"users\": [\"gespyme.employee@gmail.com\"]\r\n}\r\n",
-													"options": {
-														"raw": {
-															"language": "json"
-														}
-													}
-												},
-												"url": {
-													"raw": "http://localhost:8084/calendar/",
-													"protocol": "http",
-													"host": [
-														"localhost"
-													],
-													"port": "8084",
-													"path": [
-														"calendar",
-														""
+														"calendar"
 													]
 												}
 											},
@@ -610,7 +597,7 @@
 													}
 												},
 												"url": {
-													"raw": "http://localhost:8084/calendar/employee1-calendar",
+													"raw": "http://localhost:8084/calendar/{{calendar_to_delete_id}}",
 													"protocol": "http",
 													"host": [
 														"localhost"
@@ -618,127 +605,7 @@
 													"port": "8084",
 													"path": [
 														"calendar",
-														"employee1-calendar"
-													]
-												}
-											},
-											"response": []
-										}
-									]
-								}
-							]
-						},
-						{
-							"name": "modify",
-							"item": [
-								{
-									"name": "OK- Modify calendar - KO Admin Copy",
-									"item": [
-										{
-											"name": "GetToken Admin",
-											"event": [
-												{
-													"listen": "test",
-													"script": {
-														"exec": [
-															"var jsonData = JSON.parse(responseBody);\r",
-															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
-															"\r",
-															"pm.test(\"Token not null\", function () {\r",
-															"    const jsonData = pm.response.json(); \r",
-															"    pm.expect(jsonData.token).not.null; \r",
-															"});\r",
-															"\r",
-															"pm.test(\"Status code is 200\", function () {\r",
-															"    pm.response.to.have.status(200); \r",
-															"});"
-														],
-														"type": "text/javascript"
-													}
-												}
-											],
-											"request": {
-												"method": "POST",
-												"header": [],
-												"body": {
-													"mode": "raw",
-													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
-													"options": {
-														"raw": {
-															"language": "json"
-														}
-													}
-												},
-												"url": {
-													"raw": "http://localhost:8082/login",
-													"protocol": "http",
-													"host": [
-														"localhost"
-													],
-													"port": "8082",
-													"path": [
-														"login"
-													]
-												}
-											},
-											"response": []
-										},
-										{
-											"name": "ModifyCalendar",
-											"event": [
-												{
-													"listen": "prerequest",
-													"script": {
-														"exec": [
-															"pm.request.headers.add({\r",
-															"    key: 'Authorization',\r",
-															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
-															"});"
-														],
-														"type": "text/javascript"
-													}
-												},
-												{
-													"listen": "test",
-													"script": {
-														"exec": [
-															"\r",
-															"pm.test(\"Status code is 403\", function () {\r",
-															"    pm.response.to.have.status(403); \r",
-															"});"
-														],
-														"type": "text/javascript"
-													}
-												}
-											],
-											"request": {
-												"method": "PATCH",
-												"header": [
-													{
-														"key": "Authorization",
-														"value": "{{admin_token}}",
-														"type": "default"
-													}
-												],
-												"body": {
-													"mode": "raw",
-													"raw": "{\r\n  \"calendarName\": \"admin-calendar3\"\r\n}\r\n",
-													"options": {
-														"raw": {
-															"language": "json"
-														}
-													}
-												},
-												"url": {
-													"raw": "http://localhost:8084/calendar/{{calendar_name}}",
-													"protocol": "http",
-													"host": [
-														"localhost"
-													],
-													"port": "8084",
-													"path": [
-														"calendar",
-														"{{calendar_name}}"
+														"{{calendar_to_delete_id}}"
 													]
 												}
 											},
@@ -941,8 +808,8 @@
 													"listen": "test",
 													"script": {
 														"exec": [
-															"pm.test(\"Status code is 403\", function () {\r",
-															"    pm.response.to.have.status(403); \r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
 															"});\r",
 															"\r",
 															""
@@ -1076,15 +943,10 @@
 													"listen": "test",
 													"script": {
 														"exec": [
-															"pm.test(\"Status code is 201\", function () {\r",
-															"    pm.response.to.have.status(201); \r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
 															"});\r",
-															"\r",
-															"var jsonData = JSON.parse(responseBody);\r",
-															"pm.globals.set(\"calendar_name\", jsonData.calendarName);\r",
-															"\r",
-															"var jsonData = JSON.parse(responseBody);\r",
-															"pm.globals.set(\"calendar_id\", jsonData.calendarId);"
+															""
 														],
 														"type": "text/javascript"
 													}
@@ -1112,15 +974,14 @@
 													}
 												},
 												"url": {
-													"raw": "http://localhost:8084/calendar/",
+													"raw": "http://localhost:8084/calendar",
 													"protocol": "http",
 													"host": [
 														"localhost"
 													],
 													"port": "8084",
 													"path": [
-														"calendar",
-														""
+														"calendar"
 													]
 												}
 											},
@@ -1250,15 +1111,14 @@
 													}
 												},
 												"url": {
-													"raw": "http://localhost:8084/job/",
+													"raw": "http://localhost:8084/job",
 													"protocol": "http",
 													"host": [
 														"localhost"
 													],
 													"port": "8084",
 													"path": [
-														"job",
-														""
+														"job"
 													]
 												}
 											},
@@ -1380,7 +1240,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\r\n  \"jobId\": \"{{job_id}}\",\r\n  \"startDate\": \"2024-12-02T10:00:00\",\r\n  \"endDate\": \"2024-12-03T12:00:00\",\r\n  \"status\": \"PENDING\"\r\n}\r\n",
+													"raw": "{\r\n  \"jobId\": \"{{job_id}}\",\r\n  \"startDate\": \"2024-12-04T10:00:00\",\r\n  \"endDate\": \"2024-12-05T12:00:00\",\r\n  \"status\": \"PENDING\"\r\n}\r\n",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -1388,15 +1248,16 @@
 													}
 												},
 												"url": {
-													"raw": "http://localhost:8084/appointment/",
+													"raw": "http://localhost:8084/job/{{job_id}}/appointment",
 													"protocol": "http",
 													"host": [
 														"localhost"
 													],
 													"port": "8084",
 													"path": [
-														"appointment",
-														""
+														"job",
+														"{{job_id}}",
+														"appointment"
 													]
 												}
 											},
@@ -1491,15 +1352,12 @@
 													"listen": "test",
 													"script": {
 														"exec": [
-															"pm.test(\"Status code is 201\", function () {\r",
-															"    pm.response.to.have.status(201); \r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
 															"});\r",
 															"\r",
 															"var jsonData = JSON.parse(responseBody);\r",
-															"pm.globals.set(\"calendar_name\", jsonData.calendarName);\r",
-															"\r",
-															"var jsonData = JSON.parse(responseBody);\r",
-															"pm.globals.set(\"calendar_id\", jsonData.calendarId);"
+															"pm.globals.set(\"appointment_id\", jsonData.appointmentId);"
 														],
 														"type": "text/javascript"
 													}
@@ -1516,7 +1374,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\r\n  \"jobId\": \"8c359922-e94d-477f-bd0a-c21357395f5a\",\r\n  \"startDate\": \"2024-12-01T10:00:00\",\r\n  \"endDate\": \"2024-12-01T12:00:00\",\r\n  \"status\": \"PENDING\"\r\n}\r\n",
+													"raw": "{\r\n  \"jobId\": \"{{job_id}}\",\r\n  \"startDate\": \"2024-12-06T10:00:00\",\r\n  \"endDate\": \"2024-12-07T12:00:00\",\r\n  \"status\": \"PENDING\"\r\n}\r\n",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -1524,13 +1382,15 @@
 													}
 												},
 												"url": {
-													"raw": "http://localhost:8084/appointment/{{appointment_id}}",
+													"raw": "http://localhost:8084/job/{{job_id}}/appointment/{{appointment_id}}",
 													"protocol": "http",
 													"host": [
 														"localhost"
 													],
 													"port": "8084",
 													"path": [
+														"job",
+														"{{job_id}}",
 														"appointment",
 														"{{appointment_id}}"
 													]
@@ -1627,8 +1487,8 @@
 													"listen": "test",
 													"script": {
 														"exec": [
-															"pm.test(\"Status code is 201\", function () {\r",
-															"    pm.response.to.have.status(201); \r",
+															"pm.test(\"Status code is 204\", function () {\r",
+															"    pm.response.to.have.status(204); \r",
 															"});\r",
 															"\r",
 															"var jsonData = JSON.parse(responseBody);\r",
@@ -1657,13 +1517,15 @@
 													}
 												},
 												"url": {
-													"raw": "http://localhost:8084/appointment/{{appointment_id}}",
+													"raw": "http://localhost:8084/job/{{job_id}}/appointment/{{appointment_id}}",
 													"protocol": "http",
 													"host": [
 														"localhost"
 													],
 													"port": "8084",
 													"path": [
+														"job",
+														"{{job_id}}",
 														"appointment",
 														"{{appointment_id}}"
 													]

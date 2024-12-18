@@ -21,12 +21,6 @@ public class CalendarEntity {
   @Column(name = "calendar_name")
   private String calendarName;
 
-  @Column(name = "user_by_calendar_id")
-  private String userByCalendarId;
-
-  @Column(name = "jobs_by_calendar_id")
-  private String jobsByCalendarId;
-
   @OneToMany(mappedBy = "calendar", orphanRemoval = true)
   private List<UserByCalendarEntity> users;
 }

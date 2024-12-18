@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
 public interface UsersByCalendarRepositorySpringJpa
     extends JpaRepository<UserByCalendarEntity, String>,
         QuerydslPredicateExecutor<UserByCalendarEntity> {
-    List<UserByCalendarEntity> findByUserEmail(String userId);
+  List<UserByCalendarEntity> findByUserEmail(String userId);
 }

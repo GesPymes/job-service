@@ -1,17 +1,15 @@
 package com.gespyme.application.calendar.port.input;
 
 import com.gespyme.application.calendar.usecase.DeleteCalendarUseCase;
-import com.gespyme.commons.exeptions.NotFoundException;
 import com.gespyme.commons.model.filter.FieldFilter;
 import com.gespyme.commons.repository.criteria.SearchCriteria;
 import com.gespyme.domain.calendar.filter.CalendarFilter;
 import com.gespyme.domain.calendar.model.Calendar;
 import com.gespyme.domain.calendar.repository.CalendarRepository;
+import com.gespyme.domain.calendar.repository.CalendarService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import com.gespyme.domain.calendar.repository.CalendarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -33,14 +31,21 @@ public class DeleteCalendarPort implements DeleteCalendarUseCase {
         .filter(f -> f.apply(calendarFilter))
         .forEach(f -> f.addSearchCriteria(calendarFilter, searchCriterias));
 
-
     List<Calendar> calendars = repository.findByCriteria(searchCriterias);
-        calendars.stream()
-            .map(Calendar::getCalendarId)
-                .forEach(calendar -> {
-                  repository.deleteById(calendar);
-                  calendarService.deleteCalendar(calendar);
-                });
+    calendars.stream()
+        .map(Calendar::getCalendarId)
+        .forEach(
+            calendar -> {
+              repository.deleteById(calendar);
+              calendarService.deleteCalendar(calendar);
+            });
+  }
 
+  public void deleteCalendarById(String calendarId) {
+    if (Objects.isNull(calendarId)) {
+      return;
+    }
+    repository.deleteById(calendarId);
+    calendarService.deleteCalendar(calendarId);
   }
 }

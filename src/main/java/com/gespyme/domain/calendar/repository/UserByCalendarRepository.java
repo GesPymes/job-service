@@ -4,6 +4,7 @@ import com.gespyme.domain.calendar.model.UserByCalendar;
 import java.util.List;
 
 public interface UserByCalendarRepository {
-    List<UserByCalendar> getUserByCalendarByUserEmail(String userId);
-    void save(UserByCalendar userByCalendar);
+  List<UserByCalendar> getUserByCalendarByUserEmail(String userId);
+
+  UserByCalendar save(UserByCalendar userByCalendar);
 }

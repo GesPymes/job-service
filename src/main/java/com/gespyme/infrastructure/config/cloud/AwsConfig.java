@@ -32,6 +32,9 @@ public class AwsConfig {
 
   @Bean
   public S3Client s3Client(StsAssumeRoleCredentialsProvider credentialsProvider) {
-    return S3Client.builder().region(Region.of(region)).credentialsProvider(credentialsProvider).build();
+    return S3Client.builder()
+        .region(Region.of(region))
+        .credentialsProvider(credentialsProvider)
+        .build();
   }
 }

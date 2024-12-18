@@ -8,10 +8,12 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-        componentModel = MappingConstants.ComponentModel.SPRING)
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+    componentModel = MappingConstants.ComponentModel.SPRING)
 public interface UserByCalendarMapper {
-    UserByCalendar map(UserByCalendarEntity entity);
-    List<UserByCalendar> map(List<UserByCalendarEntity> entity);
-    UserByCalendarEntity map(UserByCalendar entity);
+  UserByCalendar map(UserByCalendarEntity entity);
+
+  List<UserByCalendar> map(List<UserByCalendarEntity> entity);
+
+  UserByCalendarEntity map(UserByCalendar entity);
 }

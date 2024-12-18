@@ -28,11 +28,13 @@ public class AppointmentJpaRepository implements AppointmentRepository {
   public AppointmentJpaRepository(
       AppointmentMapper mapper,
       AppointmentRepositorySpringJpa appointmentRepositorySpringJpa,
-      Map<String, QueryField> queryFieldMap,
+      List<QueryField> queryFields,
       JPAQueryFactory jobQueryFactory) {
     this.mapper = mapper;
     this.appointmentRepositorySpringJpa = appointmentRepositorySpringJpa;
-    this.queryFieldMap = queryFieldMap;
+    this.queryFieldMap =
+        queryFields.stream()
+            .collect(Collectors.toMap(QueryField::getFieldName, queryField -> queryField));
     this.jobQueryFactory = jobQueryFactory;
   }
 
@@ -77,6 +79,7 @@ public class AppointmentJpaRepository implements AppointmentRepository {
         jobQueryFactory
             .select(
                 appointmentEntity.appointmentId,
+                appointmentEntity.jobId,
                 appointmentEntity.status,
                 appointmentEntity.startDate,
                 appointmentEntity.endDate)
@@ -95,9 +98,10 @@ public class AppointmentJpaRepository implements AppointmentRepository {
   private Appointment mapTuple(Tuple tuple, QAppointmentEntity appointment) {
     return Appointment.builder()
         .jobId(tuple.get(appointment.jobId))
+        .appointmentId(tuple.get(appointment.appointmentId))
         .status(tuple.get(appointment.status))
-        .endDate(tuple.get(appointment.startDate))
-        .startDate(tuple.get(appointment.endDate))
+        .endDate(tuple.get(appointment.endDate))
+        .startDate(tuple.get(appointment.startDate))
         .build();
   }
 }

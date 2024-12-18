@@ -5,7 +5,9 @@ import com.gespyme.commons.repository.criteria.SearchCriteria;
 import com.gespyme.commons.repository.criteria.SearchOperation;
 import java.util.List;
 import java.util.Objects;
+import org.springframework.stereotype.Component;
 
+@Component
 public class FromStartDateFilter implements FieldFilter<AppointmentFilter> {
   @Override
   public boolean apply(AppointmentFilter filter) {

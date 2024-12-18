@@ -23,29 +23,25 @@ public class CreateCalendarPort implements CreateCalendarUseCase {
   private final UserByCalendarRepository userByCalendarRepository;
 
   public Calendar createCalendar(Calendar calendar) {
-   String calendarId = calendarService.createCalendar(calendar.getCalendarName());
+    String calendarId = calendarService.createCalendar(calendar.getCalendarName());
     calendarService.shareCalendar(calendarId, adminEmail);
 
-    Optional.ofNullable(calendar.getUsers())
-        .ifPresent(
-            users ->
-                users.forEach(
-                    user -> calendarService.shareCalendar(calendarId, user.getUserEmail())));
-
-
     Calendar saved = repository.save(getCalendarToSave(calendar, calendarId));
-    addCalendarId(addAdminToUsersByCalendar(calendar.getUsers()), calendarId)
-        .forEach(userByCalendarRepository::save);
-    return saved;
+    List<UserByCalendar> userByCalendarList = new ArrayList<>();
+
+    addAdminToUsersByCalendar(calendar.getUsers()).forEach(
+                        user -> {
+                          calendarService.shareCalendar(calendarId, user.getUserEmail());
+                          UserByCalendar userByCalendar =
+                              userByCalendarRepository.save(
+                                  user.toBuilder().calendarId(calendarId).build());
+                          userByCalendarList.add(userByCalendar);
+                        });
+    return saved.toBuilder().users(userByCalendarList).build();
   }
 
   private Calendar getCalendarToSave(Calendar calendar, String calendarId) {
     return calendar.toBuilder().calendarId(calendarId).build();
-  }
-
-  private List<UserByCalendar> addCalendarId(List<UserByCalendar> users, String calendarId) {
-    users.forEach(user -> user.setCalendarId(calendarId));
-    return users;
   }
 
   private List<UserByCalendar> addAdminToUsersByCalendar(List<UserByCalendar> userByCalendarList) {

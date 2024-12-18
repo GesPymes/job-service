@@ -10,14 +10,9 @@ import com.gespyme.domain.job.model.Job;
 import com.gespyme.domain.job.model.JobByCalendar;
 import com.gespyme.domain.job.repository.JobByCalendarRepository;
 import com.gespyme.domain.job.repository.JobRepository;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import com.gespyme.infrastructure.adapters.appointment.input.controller.AppointmentController;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -30,14 +25,13 @@ public class CreateAppointmentPort implements CreateAppointmentUseCase {
   private final CalendarService calendarService;
 
   @Override
-  public List<Appointment> createAppointment(Appointment appointment) {
+  public List<Appointment> createAppointment(String jobId, Appointment appointment) {
     Job job =
         jobRepository
-            .findById(appointment.getJobId())
+            .findById(jobId)
             .orElseThrow(() -> new NotFoundException("Job not found"));
     List<JobByCalendar> jobByCalendars =
-        jobByCalendarRepository.getCalendarsByJobId(job.getJobId());
-
+        jobByCalendarRepository.getCalendarsByJobId(jobId);
 
     List<Appointment> appointments = new ArrayList<>();
 
@@ -46,14 +40,14 @@ public class CreateAppointmentPort implements CreateAppointmentUseCase {
             calendar -> {
               Optional<String> id =
                   calendarService.createCalendarEvent(
-                          job.getDescription(),
+                      job.getDescription(),
                       calendar.getCalendarId(),
                       appointment.getStartDate(),
                       appointment.getEndDate());
               Appointment savedAppointment =
                   repository.save(
                       appointment.toBuilder()
-                              .calendarId(calendar.getCalendarId())
+                          .calendarId(calendar.getCalendarId())
                           .appointmentId(
                               id.orElseThrow(
                                   () -> new InternalServerError("Exception saving event")))

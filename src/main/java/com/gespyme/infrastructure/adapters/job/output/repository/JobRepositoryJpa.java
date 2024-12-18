@@ -56,7 +56,7 @@ public class JobRepositoryJpa implements JobRepository {
     QJobEntity jobEntity = QJobEntity.jobEntity;
     QPeriodicJobEntity periodicJobEntity = QPeriodicJobEntity.periodicJobEntity;
     BooleanBuilder booleanBuilder = getPredicates(searchCriteria);
-    return getJobs(searchCriteria, jobEntity,periodicJobEntity, booleanBuilder);
+    return getJobs(searchCriteria, jobEntity, periodicJobEntity, booleanBuilder);
   }
 
   @Override
@@ -86,44 +86,42 @@ public class JobRepositoryJpa implements JobRepository {
         return getTupleFromJob(jobEntity, booleanBuilder);
       }
     }
-    List<Job> periodicJobTuple =
-        getJobs(periodicJobEntity, booleanBuilder);
+    List<Job> periodicJobTuple = getJobs(periodicJobEntity, booleanBuilder);
     List<Job> jobTuple = getTupleFromJob(jobEntity, booleanBuilder);
     periodicJobTuple.addAll(jobTuple);
     return periodicJobTuple;
   }
 
-  private List<Job> getTupleFromJob(
-      QJobEntity jobEntity, BooleanBuilder booleanBuilder) {
+  private List<Job> getTupleFromJob(QJobEntity jobEntity, BooleanBuilder booleanBuilder) {
     JPAQuery<Tuple> query =
         jobQueryFactory
-            .select(jobEntity.jobId,
-                    jobEntity.description,
-                    jobEntity.employeeId,
-                    jobEntity.customerId,
-                    jobEntity.calendarId)
+            .select(
+                jobEntity.jobId, jobEntity.description, jobEntity.employeeId, jobEntity.customerId)
             .from(jobEntity);
-    List<Tuple> tuples =  Objects.nonNull(booleanBuilder.getValue())
-        ? query.where(booleanBuilder).fetch()
-        : query.fetch();
-    return tuples.stream().map(tuple-> mapTuple(tuple, jobEntity)).collect(Collectors.toList());
+    List<Tuple> tuples =
+        Objects.nonNull(booleanBuilder.getValue())
+            ? query.where(booleanBuilder).fetch()
+            : query.fetch();
+    return tuples.stream().map(tuple -> mapTuple(tuple, jobEntity)).collect(Collectors.toList());
   }
 
-  private List<Job> getJobs(
-      QPeriodicJobEntity periodicJobEntity,
-      BooleanBuilder booleanBuilder) {
+  private List<Job> getJobs(QPeriodicJobEntity periodicJobEntity, BooleanBuilder booleanBuilder) {
     JPAQuery<Tuple> query =
         periodicJobQueryFactory
-            .select(periodicJobEntity.jobId,
-                    periodicJobEntity.description,
-                    periodicJobEntity.employeeId,
-                    periodicJobEntity.customerId,
-                    periodicJobEntity.calendarId)
+            .select(
+                periodicJobEntity.jobId,
+                periodicJobEntity.description,
+                periodicJobEntity.periodicity,
+                periodicJobEntity.employeeId,
+                periodicJobEntity.customerId)
             .from(periodicJobEntity);
-    List<Tuple> tuples =  Objects.nonNull(booleanBuilder.getValue())
-        ? query.where(booleanBuilder).fetch()
-        : query.fetch();
-    return tuples.stream().map(tuple -> mapPeriodicTuple(tuple, periodicJobEntity)).collect(Collectors.toList());
+    List<Tuple> tuples =
+        Objects.nonNull(booleanBuilder.getValue())
+            ? query.where(booleanBuilder).fetch()
+            : query.fetch();
+    return tuples.stream()
+        .map(tuple -> mapPeriodicTuple(tuple, periodicJobEntity))
+        .collect(Collectors.toList());
   }
 
   private BooleanBuilder getPredicates(List<SearchCriteria> searchCriteria) {
@@ -135,37 +133,40 @@ public class JobRepositoryJpa implements JobRepository {
 
   private Job mapPeriodicTuple(Tuple tuple, QPeriodicJobEntity periodicJob) {
     return Job.builder()
-            .jobId(tuple.get(periodicJob.jobId))
-            .employeeId(tuple.get(periodicJob.employeeId))
-            .customerId(tuple.get(periodicJob.customerId))
+        .jobId(tuple.get(periodicJob.jobId))
+        .employeeId(tuple.get(periodicJob.employeeId))
+        .customerId(tuple.get(periodicJob.customerId))
         .periodicity(tuple.get(periodicJob.periodicity))
-            .isPeriodic(true)
+        .isPeriodic(true)
         .description(tuple.get(periodicJob.description))
         .build();
   }
 
   private Job mapTuple(Tuple tuple, QJobEntity job) {
     return Job.builder()
-            .jobId(tuple.get(job.jobId))
-            .employeeId(tuple.get(job.employeeId))
-            .customerId(tuple.get(job.customerId))
-            .description(tuple.get(job.description))
-            .isPeriodic(false)
-            .build();
+        .jobId(tuple.get(job.jobId))
+        .employeeId(tuple.get(job.employeeId))
+        .customerId(tuple.get(job.customerId))
+        .description(tuple.get(job.description))
+        .isPeriodic(false)
+        .build();
   }
 
   @Override
   public Optional<Job> findById(String id) {
     Optional<JobEntity> jobEntity = jobRepositorySpringJpa.findById(id);
     return jobEntity.isPresent()
-        ? jobEntity.map(mapper::map).map(x-> x.withIsPeriodic(false))
-        : periodicJobRepositorySpringJpa.findById(id).map(mapper::map).map(x-> x.withIsPeriodic(true));
+        ? jobEntity.map(mapper::map).map(x -> x.withIsPeriodic(false))
+        : periodicJobRepositorySpringJpa
+            .findById(id)
+            .map(mapper::map)
+            .map(x -> x.withIsPeriodic(true));
   }
 
   @Override
   public void deleteById(String id) throws NotFoundException {
     Job job = findById(id).orElseThrow(() -> new NotFoundException("Job not found"));
-    if(job.getIsPeriodic()) {
+    if (job.getIsPeriodic()) {
       periodicJobRepositorySpringJpa.deleteById(id);
     }
     jobRepositorySpringJpa.deleteById(id);
@@ -177,18 +178,18 @@ public class JobRepositoryJpa implements JobRepository {
         Optional.ofNullable(job.getIsPeriodic())
             .orElseThrow(() -> new BadRequestException("Periodic field must be informed"));
     return isPeriodic
-        ? mapper.map(jobRepositorySpringJpa.save(mapper.mapToEntity(job)))
-        : mapper.map(periodicJobRepositorySpringJpa.save(mapper.mapToPeriodicEntity(job)));
+        ? mapper.map(periodicJobRepositorySpringJpa.save(mapper.mapToPeriodicEntity(job)))
+        : mapper.map(jobRepositorySpringJpa.save(mapper.mapToEntity(job)));
   }
 
   @Override
   public Job merge(Job newJobData, Job job) {
     Job merged = mapper.merge(newJobData, job);
     Boolean isPeriodic =
-            Optional.ofNullable(merged.getIsPeriodic())
-                    .orElseThrow(() -> new BadRequestException("Periodic field must be informed"));
+        Optional.ofNullable(merged.getIsPeriodic())
+            .orElseThrow(() -> new BadRequestException("Periodic field must be informed"));
     return isPeriodic
-            ? mapper.map(jobRepositorySpringJpa.save(mapper.mapToEntity(job)))
-            : mapper.map(periodicJobRepositorySpringJpa.save(mapper.mapToPeriodicEntity(job)));
+        ? mapper.map(periodicJobRepositorySpringJpa.save(mapper.mapToPeriodicEntity(job)))
+        : mapper.map(jobRepositorySpringJpa.save(mapper.mapToEntity(job)));
   }
 }

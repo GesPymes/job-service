@@ -44,7 +44,7 @@ public class JobController {
     deleteJobUseCase.deleteJob(jobId);
   }
 
-  @PostMapping("/")
+  @PostMapping
   public ResponseEntity<JobModelApi> createJob(@RequestBody JobModelApi jobApiModel) {
     validatorService.validate(jobApiModel, List.of(Validator.ALL_PARAMS_NOT_NULL));
     Job job = createJobUseCase.createJob(jobMapper.map(jobApiModel));
