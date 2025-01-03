@@ -21,18 +21,22 @@ public class FindAppointmentsPort implements FindAppointmentsUseCase {
   private final List<FieldFilter<AppointmentFilter>> filters;
 
   @Override
-  public List<Appointment> findAppointments(String jobId,
-      AppointmentFilter appointmentFilter, boolean isPeriodicBatchCall) {
-    jobRepository
-            .findById(jobId)
-            .orElseThrow(() -> new NotFoundException("Job not found"));
+  public List<Appointment> findAppointments(String jobId, AppointmentFilter appointmentFilter) {
+    jobRepository.findById(jobId).orElseThrow(() -> new NotFoundException("Job not found"));
     appointmentFilter.setJobId(jobId);
+    return getAppointments(appointmentFilter);
+  }
 
+  @Override
+  public List<Appointment> findAppointments(AppointmentFilter appointmentFilter) {
+    return getAppointments(appointmentFilter);
+  }
+
+  private List<Appointment> getAppointments(AppointmentFilter appointmentFilter) {
     List<SearchCriteria> searchCriterias = new ArrayList<>();
     filters.stream()
         .filter(f -> f.apply(appointmentFilter))
         .forEach(f -> f.addSearchCriteria(appointmentFilter, searchCriterias));
     return appointmentRepository.findByCriteria(searchCriterias);
   }
-
 }

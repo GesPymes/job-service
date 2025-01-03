@@ -6,8 +6,7 @@ import com.gespyme.commons.repository.criteria.SearchCriteria;
 import com.gespyme.domain.job.model.Job;
 import com.gespyme.domain.job.model.filter.JobFilter;
 import com.gespyme.domain.job.repository.JobRepository;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,13 +17,11 @@ public class FindJobsPort implements FindJobsUseCase {
   private final List<FieldFilter<JobFilter>> filters;
 
   @Override
-  public List<Job> findJobs(JobFilter appointmentFilter, boolean isPeriodicBatchCall) {
+  public List<Job> findJobs(JobFilter jobFilter, boolean isPeriodicBatchCall) {
     List<SearchCriteria> searchCriterias = new ArrayList<>();
     filters.stream()
-        .filter(f -> f.apply(appointmentFilter))
-        .forEach(f -> f.addSearchCriteria(appointmentFilter, searchCriterias));
-    return isPeriodicBatchCall
-        ? jobRepository.findPendingPeriodicJobs(searchCriterias)
-        : jobRepository.findByCriteria(searchCriterias);
+        .filter(f -> f.apply(jobFilter))
+        .forEach(f -> f.addSearchCriteria(jobFilter, searchCriterias));
+    return jobRepository.findByCriteria(searchCriterias);
   }
 }

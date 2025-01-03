@@ -26,7 +26,6 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 @RequiredArgsConstructor
 public class GoogleCloudConfig {
 
-  private static final String TOKENS_DIRECTORY_PATH = "tokens";
   private static final List<String> SCOPES = Collections.singletonList(CalendarScopes.CALENDAR);
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
   private static final String APPLICATION_NAME = "GesPyme Calendar Integration";

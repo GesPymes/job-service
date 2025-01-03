@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class PeriodicityFilter implements FieldFilter<JobFilter> {
   @Override
   public boolean apply(JobFilter filter) {
-    return Objects.nonNull(filter.getIsPeriodic());
+    return Objects.nonNull(filter.getPeriodicity());
   }
 
   @Override
@@ -20,7 +20,7 @@ public class PeriodicityFilter implements FieldFilter<JobFilter> {
         SearchCriteria.builder()
             .key("periodicity")
             .operation(SearchOperation.EQUAL)
-            .value(filter.getIsPeriodic())
+            .value(filter.getPeriodicity())
             .build());
   }
 }

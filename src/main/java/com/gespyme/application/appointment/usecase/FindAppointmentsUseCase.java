@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface FindAppointmentsUseCase {
   List<Appointment> findAppointments(
-          String jobId, AppointmentFilter appointmentFilter, boolean isPeriodicBatchCall);
+          String jobId, AppointmentFilter appointmentFilter);
+  List<Appointment> findAppointments(AppointmentFilter appointmentFilter);
 }

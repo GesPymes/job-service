@@ -11,19 +11,19 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class JobIdField implements QueryField<AppointmentEntity> {
+public class StatusField implements QueryField<AppointmentEntity> {
 
   private final PredicateBuilder<String> predicateBuilder;
 
   @Override
   public String getFieldName() {
-    return "job_id";
+    return "status";
   }
 
   @Override
   public void addToQuery(BooleanBuilder booleanBuilder, SearchCriteria searchCriteria) {
     booleanBuilder.and(
         predicateBuilder.getBooleanBuilder(
-            QAppointmentEntity.appointmentEntity.jobId, searchCriteria));
+            QAppointmentEntity.appointmentEntity.status, searchCriteria));
   }
 }

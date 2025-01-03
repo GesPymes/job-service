@@ -31,7 +31,7 @@ public class JobController {
     return ResponseEntity.ok(jobMapper.map(job));
   }
 
-  @GetMapping("/")
+  @GetMapping
   public ResponseEntity<List<JobModelApi>> findJobs(JobFilterModelApi jobFilterModelApi) {
     validatorService.validate(jobFilterModelApi, List.of(Validator.ONE_PARAM_NOT_NULL));
     JobFilter jobFilter = jobMapper.map(jobFilterModelApi);
@@ -59,13 +59,5 @@ public class JobController {
     validatorService.validate(jobApiModel, List.of(Validator.ONE_PARAM_NOT_NULL));
     Job job = modifyJobUseCase.modifyJob(jobId, jobMapper.map(jobApiModel));
     return ResponseEntity.ok(jobMapper.map(job));
-  }
-
-  @GetMapping("/findPendingJobs")
-  public ResponseEntity<List<JobModelApi>> findPeriodicJobs(JobFilterModelApi jobFilterModelApi) {
-    validatorService.validate(jobFilterModelApi, List.of(Validator.ONE_PARAM_NOT_NULL));
-    JobFilter jobFilter = jobMapper.map(jobFilterModelApi);
-    List<Job> calendars = findJobsUseCase.findJobs(jobFilter, true);
-    return ResponseEntity.ok(jobMapper.map(calendars));
   }
 }

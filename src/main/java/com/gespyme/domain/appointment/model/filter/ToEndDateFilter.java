@@ -20,7 +20,7 @@ public class ToEndDateFilter implements FieldFilter<AppointmentFilter> {
         SearchCriteria.builder()
             .key("end_date")
             .operation(SearchOperation.BEFORE)
-            .value(filter.getStartDate())
+            .value(filter.getEndDate())
             .build());
   }
 }

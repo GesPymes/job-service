@@ -20,7 +20,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class CalendarJpaRepository implements CalendarRepository {
-  private final Map<String, QueryField> queryFieldMap;
+  private final Map<String, QueryField<CalendarEntity>> queryFieldMap;
   private final JPAQueryFactory queryFactory;
   private final CalendarMapper mapper;
   private final CalendarRepositorySpringJpa calendarRepositoryJpa;

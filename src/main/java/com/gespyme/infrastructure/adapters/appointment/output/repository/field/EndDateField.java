@@ -6,24 +6,25 @@ import com.gespyme.commons.repository.criteria.SearchCriteria;
 import com.gespyme.infrastructure.adapters.appointment.output.model.entity.AppointmentEntity;
 import com.gespyme.infrastructure.adapters.appointment.output.model.entity.QAppointmentEntity;
 import com.querydsl.core.BooleanBuilder;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class JobIdField implements QueryField<AppointmentEntity> {
+public class EndDateField implements QueryField<AppointmentEntity> {
 
-  private final PredicateBuilder<String> predicateBuilder;
+  private final PredicateBuilder<LocalDateTime> predicateBuilder;
 
   @Override
   public String getFieldName() {
-    return "job_id";
+    return "end_date";
   }
 
   @Override
   public void addToQuery(BooleanBuilder booleanBuilder, SearchCriteria searchCriteria) {
     booleanBuilder.and(
         predicateBuilder.getBooleanBuilder(
-            QAppointmentEntity.appointmentEntity.jobId, searchCriteria));
+            QAppointmentEntity.appointmentEntity.endDate, searchCriteria));
   }
 }

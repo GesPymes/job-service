@@ -2,15 +2,13 @@ package com.gespyme.infrastructure.mapper;
 
 import com.gespyme.commons.model.job.JobFilterModelApi;
 import com.gespyme.commons.model.job.JobModelApi;
+import com.gespyme.domain.appointment.model.Appointment;
 import com.gespyme.domain.job.model.Job;
 import com.gespyme.domain.job.model.filter.JobFilter;
+import com.gespyme.infrastructure.adapters.appointment.output.model.entity.AppointmentEntity;
 import com.gespyme.infrastructure.adapters.job.output.model.entity.JobEntity;
-import com.gespyme.infrastructure.adapters.job.output.model.entity.PeriodicJobEntity;
 import java.util.List;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingConstants;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.*;
 
 @Mapper(
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
@@ -23,17 +21,15 @@ public interface JobMapper {
 
   List<JobModelApi> map(List<Job> jobs);
 
-  JobModelApi map(Job jobs);
+  JobModelApi map(Job job);
 
+  @Mapping(target = "appointmentList", source = "appointments")
   Job map(JobEntity jobEntity);
 
+  @Mapping(target = "appointments", source = "appointmentList")
   JobEntity mapToEntity(Job job);
 
   Job merge(Job newJob, @MappingTarget Job job);
 
-  Job map(PeriodicJobEntity periodicJobEntity);
-
-  List<Job> mapEntityList(List<PeriodicJobEntity> periodicJobEntity);
-
-  PeriodicJobEntity mapToPeriodicEntity(Job job);
+  Appointment map (AppointmentEntity appointmentEntity);
 }

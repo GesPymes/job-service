@@ -1,5 +1,7 @@
 package com.gespyme.domain.job.model;
 
+import com.gespyme.domain.appointment.model.Appointment;
+import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 import lombok.With;
@@ -14,6 +16,7 @@ public class Job {
   private String customerLastName;
   private String employeeName;
   @With private Integer periodicity;
-  @With private Boolean isPeriodic;
+  @With private boolean periodic;
   private String description;
+  private List<Appointment> appointmentList;
 }

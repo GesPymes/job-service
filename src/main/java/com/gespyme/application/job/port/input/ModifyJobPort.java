@@ -38,7 +38,7 @@ public class ModifyJobPort implements ModifyJobUseCase {
   }
 
   private void performPeriodicTableChange(Job job, Job newJob) {
-    if (Objects.nonNull(newJob.getIsPeriodic()) && newJob.getIsPeriodic() != job.getIsPeriodic()) {
+    if (newJob.isPeriodic() != job.isPeriodic()) {
       repository.deleteById(job.getJobId());
     }
   }

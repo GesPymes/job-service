@@ -1,13 +1,12 @@
 package com.gespyme.infrastructure.adapters.job.output.model.entity;
 
-import com.gespyme.domain.job.model.JobByCalendar;
+import com.gespyme.infrastructure.adapters.appointment.output.model.entity.AppointmentEntity;
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @Entity
 @Getter
@@ -28,4 +27,13 @@ public class JobEntity {
 
   @Column(name = "description")
   private String description;
+
+  @Column(name = "periodicity")
+  private int periodicity;
+
+  @Column(name = "is_periodic")
+  private boolean periodic;
+
+  @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  private List<AppointmentEntity> appointments;
 }

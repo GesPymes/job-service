@@ -11,16 +11,16 @@ import org.springframework.stereotype.Component;
 public class IsPeriodicFilter implements FieldFilter<JobFilter> {
   @Override
   public boolean apply(JobFilter filter) {
-    return Objects.nonNull(filter.getIsPeriodic());
+    return Objects.nonNull(filter.getPeriodic());
   }
 
   @Override
   public void addSearchCriteria(JobFilter filter, List<SearchCriteria> searchCriteriaList) {
     searchCriteriaList.add(
         SearchCriteria.builder()
-            .key("is_periodic")
+            .key("periodic")
             .operation(SearchOperation.EQUAL)
-            .value(filter.getIsPeriodic())
+            .value(filter.getPeriodic())
             .build());
   }
 }

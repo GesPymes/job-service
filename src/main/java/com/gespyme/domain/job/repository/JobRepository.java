@@ -7,6 +7,4 @@ import java.util.List;
 
 public interface JobRepository extends GenericRepository<Job> {
   List<Job> findByCriteria(List<SearchCriteria> searchCriteria);
-
-  List<Job> findPendingPeriodicJobs(List<SearchCriteria> searchCriteria);
 }

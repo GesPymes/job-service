@@ -10,6 +10,7 @@ import com.gespyme.domain.job.model.Job;
 import com.gespyme.domain.job.model.JobByCalendar;
 import com.gespyme.domain.job.repository.JobByCalendarRepository;
 import com.gespyme.domain.job.repository.JobRepository;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,33 +28,49 @@ public class CreateAppointmentPort implements CreateAppointmentUseCase {
   @Override
   public List<Appointment> createAppointment(String jobId, Appointment appointment) {
     Job job =
-        jobRepository
-            .findById(jobId)
-            .orElseThrow(() -> new NotFoundException("Job not found"));
-    List<JobByCalendar> jobByCalendars =
-        jobByCalendarRepository.getCalendarsByJobId(jobId);
+        jobRepository.findById(jobId).orElseThrow(() -> new NotFoundException("Job not found"));
+    List<JobByCalendar> jobByCalendars = jobByCalendarRepository.getCalendarsByJobId(jobId);
+    checkAppointmentDates(appointment, job);
 
     List<Appointment> appointments = new ArrayList<>();
 
-    jobByCalendars.stream()
-        .forEach(
-            calendar -> {
-              Optional<String> id =
-                  calendarService.createCalendarEvent(
-                      job.getDescription(),
-                      calendar.getCalendarId(),
-                      appointment.getStartDate(),
-                      appointment.getEndDate());
-              Appointment savedAppointment =
-                  repository.save(
-                      appointment.toBuilder()
-                          .calendarId(calendar.getCalendarId())
-                          .appointmentId(
-                              id.orElseThrow(
-                                  () -> new InternalServerError("Exception saving event")))
-                          .build());
-              appointments.add(savedAppointment);
-            });
+    jobByCalendars.forEach(
+        calendar -> {
+          Optional<String> id = createEvent(job, calendar, appointment);
+          Appointment savedAppointment = savedAppointment(appointment, calendar, id);
+          appointments.add(savedAppointment);
+        });
     return appointments;
+  }
+
+  private Optional<String> createEvent(Job job, JobByCalendar calendar, Appointment appointment) {
+    return calendarService.createCalendarEvent(
+        job.getDescription(),
+        calendar.getCalendarId(),
+        appointment.getStartDate(),
+        appointment.getEndDate());
+  }
+
+  private Appointment savedAppointment(
+      Appointment appointment, JobByCalendar calendar, Optional<String> id) {
+    return repository.save(
+        appointment.toBuilder()
+            .calendarId(calendar.getCalendarId())
+            .appointmentId(id.orElseThrow(() -> new InternalServerError("Exception saving event")))
+            .build());
+  }
+
+  private void checkAppointmentDates(Appointment newAppointment, Job job) {
+    job.getAppointmentList().stream().forEach(appointment -> isDateOccupied(newAppointment.getStartDate(), newAppointment.getEndDate(), appointment.getStartDate(), appointment.getEndDate()));
+  }
+
+  private void isDateOccupied(
+      LocalDateTime newStartDate,
+      LocalDateTime newEndDate,
+      LocalDateTime appointmentStartDate,
+      LocalDateTime appointmentEndDate) {
+    if (newStartDate.isBefore(appointmentEndDate) && newEndDate.isAfter(appointmentStartDate)) {
+      throw new InternalServerError("Attempting to create an appointment in occupied dates");
+    }
   }
 }

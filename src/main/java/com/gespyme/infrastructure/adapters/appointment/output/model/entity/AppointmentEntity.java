@@ -1,5 +1,6 @@
 package com.gespyme.infrastructure.adapters.appointment.output.model.entity;
 
+import com.gespyme.infrastructure.adapters.job.output.model.entity.JobEntity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -31,6 +32,7 @@ public class AppointmentEntity {
   @Column(name = "end_date")
   private LocalDateTime endDate;
 
-  @Column(name = "next_end_date")
-  private LocalDateTime nextEndDate;
+  @ManyToOne
+  @JoinColumn(name = "job_id", insertable = false, updatable = false)
+  private JobEntity job;
 }

@@ -1,5 +1,7 @@
 package com.gespyme.infrastructure.adapters.appointment.output.repository;
 
+import com.gespyme.commons.exeptions.NotFoundException;
+import com.gespyme.commons.model.job.AppointmentStatus;
 import com.gespyme.commons.repository.QueryField;
 import com.gespyme.commons.repository.criteria.SearchCriteria;
 import com.gespyme.domain.appointment.model.Appointment;
@@ -22,13 +24,13 @@ import org.springframework.stereotype.Repository;
 public class AppointmentJpaRepository implements AppointmentRepository {
   private final AppointmentMapper mapper;
   private final AppointmentRepositorySpringJpa appointmentRepositorySpringJpa;
-  private final Map<String, QueryField> queryFieldMap;
+  private final Map<String, QueryField<AppointmentEntity>> queryFieldMap;
   private final JPAQueryFactory jobQueryFactory;
 
   public AppointmentJpaRepository(
       AppointmentMapper mapper,
       AppointmentRepositorySpringJpa appointmentRepositorySpringJpa,
-      List<QueryField> queryFields,
+      List<QueryField<AppointmentEntity>> queryFields,
       JPAQueryFactory jobQueryFactory) {
     this.mapper = mapper;
     this.appointmentRepositorySpringJpa = appointmentRepositorySpringJpa;
@@ -45,7 +47,9 @@ public class AppointmentJpaRepository implements AppointmentRepository {
 
   @Override
   public void deleteById(String id) {
-    appointmentRepositorySpringJpa.deleteById(id);
+    AppointmentEntity appointment = appointmentRepositorySpringJpa.findById(id).orElseThrow(() -> new NotFoundException("Appointment not found"));
+    appointment.setStatus(AppointmentStatus.CANCELLED.toString());
+    appointmentRepositorySpringJpa.save(appointment);
   }
 
   @Override

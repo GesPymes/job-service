@@ -8,13 +8,11 @@ import com.gespyme.domain.appointment.model.Appointment;
 import com.gespyme.domain.appointment.repository.AppointmentRepository;
 import com.gespyme.domain.calendar.repository.CalendarService;
 import com.gespyme.domain.job.model.Job;
-import com.gespyme.domain.job.model.JobByCalendar;
 import com.gespyme.domain.job.repository.JobByCalendarRepository;
 import com.gespyme.domain.job.repository.JobRepository;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor

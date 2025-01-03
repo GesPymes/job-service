@@ -1,13 +1,10 @@
 package com.gespyme.infrastructure.adapters.job.output.model.entity;
 
-import com.gespyme.domain.job.model.JobByCalendar;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @Entity
 @Getter
